@@ -1,13 +1,21 @@
 FROM python:3.10-slim
 
-# Install ffmpeg, git, and system dependencies
-RUN apt-get update && apt-get install -y ffmpeg git && apt-get clean
+# Install required system packages
+RUN apt-get update && apt-get install -y \
+    git ffmpeg curl wget gcc pkg-config \
+    libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev libavfilter-dev \
+    libmagic-dev python3-dev build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Set working directory
 WORKDIR /app
 
-COPY . /app
+# Copy all files
+COPY . .
 
+# Upgrade pip and install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Run the bot
 CMD ["python3", "main.py"]
